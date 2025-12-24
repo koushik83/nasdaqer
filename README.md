@@ -27,7 +27,7 @@ The bot is deployed and running on Railway.com
 TWILIO_SID          = your_twilio_sid
 TWILIO_AUTH_TOKEN   = your_twilio_auth_token
 TWILIO_PHONE_NO     = +1xxxxxxxxxx  (Twilio calling number)
-FROM_WHATSAPP       = whatsapp:+14155238886  (Twilio sandbox)
+FROM_WHATSAPP       = whatsapp:+1xxxxxxxxx  (Twilio sandbox)
 TO_PHONE            = +91xxxxxxxxxx  (Your phone number)
 ```
 
