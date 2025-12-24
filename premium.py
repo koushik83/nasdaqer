@@ -18,6 +18,15 @@ FROM_WHATSAPP = os.environ.get('FROM_WHATSAPP')
 TO_PHONE = os.environ.get('TO_PHONE')
 TARGET_PREMIUM_LIMIT = 2.0
 
+# Debug: Print all env vars at startup
+print("=== ENV VAR CHECK ===")
+print(f"TWILIO_SID: {'SET' if TWILIO_SID else 'MISSING'}")
+print(f"TWILIO_AUTH_TOKEN: {'SET' if TWILIO_AUTH_TOKEN else 'MISSING'}")
+print(f"TWILIO_PHONE_NO: {TWILIO_PHONE_NO or 'MISSING'}")
+print(f"FROM_WHATSAPP: {FROM_WHATSAPP or 'MISSING'}")
+print(f"TO_PHONE: {TO_PHONE or 'MISSING'}")
+print("=" * 50)
+
 IST = pytz.timezone('Asia/Kolkata')
 
 def get_official_nav():
