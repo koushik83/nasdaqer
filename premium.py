@@ -1,7 +1,7 @@
 import requests
 import time
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 from twilio.rest import Client
 from dotenv import load_dotenv
@@ -55,6 +55,24 @@ def is_market_open():
     start_time = now.replace(hour=9, minute=15, second=0, microsecond=0)
     end_time = now.replace(hour=15, minute=30, second=0, microsecond=0)
     return start_time <= now <= end_time
+
+def seconds_until_market_open():
+    """Calculate seconds until next market open (9:10 AM IST, 5 mins early buffer)"""
+    now = datetime.now(IST)
+
+    # Target: 9:10 AM (5 min before market opens)
+    next_open = now.replace(hour=9, minute=10, second=0, microsecond=0)
+
+    # If it's already past 9:10 AM today, target tomorrow
+    if now >= next_open:
+        next_open += timedelta(days=1)
+
+    # Skip weekends
+    while next_open.weekday() > 4:  # 5=Saturday, 6=Sunday
+        next_open += timedelta(days=1)
+
+    sleep_seconds = (next_open - now).total_seconds()
+    return int(sleep_seconds), next_open
 
 def trigger_alert(premium, m_price, current_inav):
     """Send WhatsApp message and voice call via Twilio"""
@@ -121,7 +139,10 @@ while True:
         except Exception as e:
             print(f"Error: {e}")
 
-        time.sleep(120)  # Check every 2 minutes during market hours
+        time.sleep(600)  # Check every 10 minutes during market hours
     else:
-        print(f"[{now.strftime('%H:%M')}] Market closed. Sleeping...")
-        time.sleep(600)  # Sleep 10 mins when market is closed
+        sleep_secs, next_open = seconds_until_market_open()
+        hours = sleep_secs // 3600
+        mins = (sleep_secs % 3600) // 60
+        print(f"[{now.strftime('%H:%M')}] Market closed. Sleeping {hours}h {mins}m until {next_open.strftime('%A %d-%b %H:%M')} IST")
+        time.sleep(sleep_secs)
