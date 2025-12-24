@@ -155,5 +155,12 @@ while True:
         sleep_secs, next_open = seconds_until_market_open()
         hours = sleep_secs // 3600
         mins = (sleep_secs % 3600) // 60
-        print(f"[{now.strftime('%H:%M')}] Market closed. Sleeping {hours}h {mins}m until {next_open.strftime('%A %d-%b %H:%M')} IST")
-        time.sleep(sleep_secs)
+        print(f"[{now.strftime('%H:%M')}] Market closed. Next open: {next_open.strftime('%A %d-%b %H:%M')} IST ({hours}h {mins}m)")
+
+        # Sleep in 30-min chunks to keep container alive on Railway
+        while sleep_secs > 0:
+            chunk = min(1800, sleep_secs)  # 30 min max
+            time.sleep(chunk)
+            sleep_secs -= chunk
+            if sleep_secs > 0:
+                print(f"[{datetime.now(IST).strftime('%H:%M')}] Still waiting... {sleep_secs // 3600}h {(sleep_secs % 3600) // 60}m to go")
