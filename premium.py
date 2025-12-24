@@ -105,7 +105,7 @@ print("NASDAQ Speed Bot v2.0 - Started")
 print("=" * 50)
 
 official_nav = get_official_nav()
-print(f"Official Closing NAV (AMFI): ₹{official_nav}")
+print(f"Official Closing NAV (AMFI): Rs {official_nav}")
 print(f"Target Premium: <= {TARGET_PREMIUM_LIMIT}%")
 print(f"Alerts will be sent to: {TO_PHONE}")
 print("=" * 50)
@@ -119,7 +119,7 @@ while True:
     if now.hour == 9 and now.minute == 15:
         alert_sent_today = False
         official_nav = get_official_nav()  # Refresh NAV at market open
-        print(f"New day! Refreshed NAV: ₹{official_nav}")
+        print(f"New day! Refreshed NAV: Rs {official_nav}")
 
     if is_market_open():
         try:
@@ -129,10 +129,11 @@ while True:
             current_inav = official_nav * (live_fx / closed_fx)
             premium = ((m_price - current_inav) / current_inav) * 100
 
-            print(f"[{now.strftime('%H:%M:%S')}] Price: ₹{m_price:.2f} | iNAV: ₹{current_inav:.2f} | FX: {live_fx:.2f} | Premium: {premium:.2f}%")
+            fx_change = ((live_fx - closed_fx) / closed_fx) * 100
+            print(f"[{now.strftime('%H:%M:%S')}] Price: Rs {m_price:.2f} | NAV: Rs {official_nav:.2f} | FX: {closed_fx:.2f} -> {live_fx:.2f} ({fx_change:+.2f}%) | Adj iNAV: Rs {current_inav:.2f} | Premium: {premium:.2f}%")
 
             if premium <= TARGET_PREMIUM_LIMIT and not alert_sent_today:
-                print("🎯 TARGET HIT! Triggering alerts...")
+                print(">>> TARGET HIT! Triggering alerts...")
                 trigger_alert(premium, m_price, current_inav)
                 alert_sent_today = True
                 time.sleep(3600)  # Wait 1 hour before checking again
