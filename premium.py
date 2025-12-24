@@ -152,10 +152,27 @@ while True:
 
         time.sleep(600)  # Check every 10 minutes during market hours
     else:
+        # Show current data even when market is closed
+        try:
+            m_price, live_fx, closed_fx = get_live_market_data()
+            current_inav = official_nav * (live_fx / closed_fx)
+            premium = ((m_price - current_inav) / current_inav) * 100
+            fx_change = ((live_fx - closed_fx) / closed_fx) * 100
+
+            print(f"[{now.strftime('%H:%M')}] MARKET CLOSED - Current snapshot:")
+            print(f"  ETF Price: Rs {m_price:.2f}")
+            print(f"  Official NAV: Rs {official_nav:.2f}")
+            print(f"  USD/INR: {closed_fx:.2f} -> {live_fx:.2f} ({fx_change:+.2f}%)")
+            print(f"  Adjusted iNAV: Rs {current_inav:.2f}")
+            print(f"  Premium: {premium:.2f}%")
+        except Exception as e:
+            print(f"[{now.strftime('%H:%M')}] Could not fetch data: {e}")
+
         sleep_secs, next_open = seconds_until_market_open()
         hours = sleep_secs // 3600
         mins = (sleep_secs % 3600) // 60
-        print(f"[{now.strftime('%H:%M')}] Market closed. Next open: {next_open.strftime('%A %d-%b %H:%M')} IST ({hours}h {mins}m)")
+        print(f"  Next market open: {next_open.strftime('%A %d-%b %H:%M')} IST ({hours}h {mins}m)")
+        print("-" * 50)
 
         # Sleep in 30-min chunks to keep container alive on Railway
         while sleep_secs > 0:
