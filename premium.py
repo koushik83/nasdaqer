@@ -7,6 +7,7 @@ from twilio.rest import Client
 from dotenv import load_dotenv
 
 # Load .env file for local development
+# small change
 load_dotenv()
 
 # --- TWILIO CONFIG (from environment variables) ---
